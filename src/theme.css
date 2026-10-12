@@ -1,0 +1,79 @@
+/* User-supplied brand colours. Semantic text colours account for the surface. */
+:root {
+  --navy: #0D1B2A;
+  --blue: #1A73E8;
+  --gray: #E6E9EC;
+  --green: #2BC48A;
+  --paper: #FFFFFF;
+  --ink: var(--navy);
+  --muted: #435369;
+  --line: #CBD3DC;
+  --accent: var(--blue);
+  --link: #155FC0;
+  --panel: var(--gray);
+  --glass: rgba(255, 255, 255, .78);
+  --glass-border: #A7B8CC;
+}
+:root[data-theme=dark] {
+  --paper: var(--navy);
+  --ink: var(--gray);
+  --muted: #B4C3D0;
+  --line: #344B63;
+  --accent: var(--green);
+  --link: var(--green);
+  --panel: #152A3E;
+  --glass: rgba(13, 27, 42, .85);
+  --glass-border: #708AA4;
+}
+nav a:hover, .text-link:hover, .contact-links a:hover { color: var(--link); }
+.theme-toggle { border-color: var(--glass-border); }
+.contact-title:hover { color: var(--link); }
+.availability i { background: var(--green); border: 1px solid #16865D; }
+.philosophy { background: var(--navy); color: var(--gray); }
+.philosophy>.section-label { color: var(--gray); opacity: 1; }
+.philosophy .principles { border-color: #52667C; }
+.philosophy .principles p { color: #B4C3D0; opacity: 1; }
+.philosophy h3 { color: var(--green); }
+.contact { background: var(--green); color: var(--navy); border-color: #16865D; }
+.contact .contact-links { border-color: #16865D; }
+.contact a:hover { color: var(--navy); text-decoration: underline; text-underline-offset: 8px; }
+.image-label, .project-open, .dialog-close {
+  --glass: rgba(13,27,42,.9);
+  --glass-border: #708AA4;
+  color: #FFFFFF;
+}
+.image-showcase .project-number { --glass: rgba(13,27,42,.9); --glass-border: #708AA4; color: #FFFFFF; }
+.carousel-controls button:disabled { opacity: 1; color: var(--muted); background: transparent; }
+.carousel-controls button:disabled svg { opacity: .6; }
+.round-link { border-color: var(--muted); }
+.viewer-controls { position: sticky; top: 0; z-index: 2; display: flex; justify-content: flex-end; gap: 10px; padding: 12px; background: var(--paper); }
+.viewer-controls button { min-height: 44px; border-radius: 30px; padding: 10px 16px; color: var(--ink); }
+.image-dialog.is-zoomed .dialog-content>img { max-height: none; }
+.collection-button { padding: 12px 18px; border-radius: 30px; background: var(--blue); color: #FFFFFF; font-weight: 500; min-height:44px; }
+.collection-button:hover { background: #155FC0; }
+.project-caption h3 { overflow-wrap: anywhere; }
+.image-showcase .project[data-orientation=portrait] { flex-basis: 30vw; }
+.image-showcase .project-image { height: clamp(290px, 48vh, 580px); }
+.image-showcase .project-caption h3 { font-size: clamp(22px,2.2vw,34px); }
+.philosophy h2 { grid-column: 1/9; }
+@media(max-width:899px) { .image-showcase .project[data-orientation=portrait] { flex-basis: 55vw; } }
+@media(max-width:600px) { .image-showcase .project[data-orientation=portrait] { flex-basis: calc(100vw - 60px); } .image-showcase .project-image { height: 440px; } .philosophy h2 { grid-column: 1/-1; } }
+@media(min-width:900px) and (max-height:740px) { .image-showcase .project-image { height: 39vh; } }
+.theme-toggle, .carousel-controls button, .text-link, nav a, .contact a { transition: background .2s, color .2s; }
+.image-showcase .work-heading h2 { grid-column: 1/8; }
+.image-showcase .work-heading p { grid-column: 8/12; }
+.image-showcase .work-count { grid-column: 12; }
+@media(max-width:600px) {
+  .image-showcase .work-heading h2 { grid-column: 1/-1; font-size: 52px; }
+  .image-showcase .work-heading p { grid-column: 1/4; }
+  .image-showcase .work-count { grid-column: 4; }
+  .about figure { grid-column: 1/4; grid-row: 3; }
+  .about-copy { grid-column: 1/-1; grid-row: 4; font-size: 15px; }
+  .about-copy .text-link { font-size: 14px; }
+}
+@media(prefers-reduced-motion:reduce) { .theme-toggle, .carousel-controls button, .text-link, nav a, .contact a { transition: none; } }
+/* Leave enough trailing space for every artwork to align with the grid gutter. */
+.image-showcase .project:last-child{margin-right:calc(100vw - var(--pad)*2 - 65vw)}
+.image-showcase .project[data-orientation=portrait]:last-child{margin-right:calc(100vw - var(--pad)*2 - 30vw)}
+@media(max-width:899px){.image-showcase .project:last-child{margin-right:calc(100vw - var(--pad)*2 - 82vw)}.image-showcase .project[data-orientation=portrait]:last-child{margin-right:calc(100vw - var(--pad)*2 - 55vw)}}
+@media(max-width:600px){.image-showcase .project:last-child,.image-showcase .project[data-orientation=portrait]:last-child{margin-right:16px}}

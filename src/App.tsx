@@ -1,110 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Header } from './components/Header';
-import { Hero } from './components/Hero';
-import { WhoIsSection } from './components/WhoIsSection';
-import { DesignWorks } from './components/DesignWorks';
-import { NiuxversePhilosophy } from './components/NiuxversePhilosophy';
-import { ContactSection } from './components/ContactSection';
-import { Footer } from './components/Footer';
-import { AmbientSoundtrack } from './components/AmbientSoundtrack';
-import { CinematicLoader } from './components/CinematicLoader';
-import { CinematicReveal } from './components/CinematicReveal';
-import { SpeakingSection } from './components/SpeakingSection';
-import { NiuxverseAcademy } from './components/NiuxverseAcademy';
+import { useEffect, useState } from 'react';
+import { ArrowDown, ArrowUpRight, Moon, Sun } from 'lucide-react';
+import { PERSONAL_BIO, ACADEMY_DATA } from './data/content';
+import { ImageShowcase } from './components/ImageShowcase';
+import { designImages, brandImages } from 'virtual:showcase-images';
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState<string>('hero');
-  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
-  const [speechSupported, setSpeechSupported] = useState<boolean>(false);
-  const [musicEnabled, setMusicEnabled] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const finishLoading = useCallback(() => setIsLoading(false), []);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      setSpeechSupported(true);
-    }
-  }, []);
-
-  // Speech synthesizer toggle
-  const toggleSpeech = () => {
-    if (!speechSupported) return;
-
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-    } else {
-      window.speechSynthesis.cancel(); // clear previous
-      const textToRead = `
-        Hello and welcome. My name is Nwaeze David. People know me as The King of Intelligence.
-        I am a designer with roots in pharmacy and public health.
-        I created The Niuxverse to prove that powerful technologies like AI can be simple, gentle, and deeply empowering for everyday people.
-        Take a look around at my design projects, read my philosophy, and feel free to reach out anytime.
-      `;
-
-      const utterance = new SpeechSynthesisUtterance(textToRead);
-      utterance.rate = 0.95;
-      utterance.pitch = 1.0;
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-
-      window.speechSynthesis.speak(utterance);
-      setIsSpeaking(true);
-    }
-  };
-
-  // Intersection observer for current active section highlight
-  useEffect(() => {
-    const sectionIds = ['hero', 'who-is', 'works', 'philosophy', 'academy', 'speaking', 'contact'];
-
-    const handleScroll = () => {
-      const scrollPos = window.scrollY + 200;
-      for (const id of sectionIds) {
-        const el = document.getElementById(id);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPos >= top && scrollPos < top + height) {
-            setActiveSection(id);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  return (
-    <div className="bg-black text-white min-h-screen font-sans selection:bg-white selection:text-black">
-      <CinematicLoader visible={isLoading} onComplete={finishLoading} />
-      <AmbientSoundtrack ducked={isSpeaking} enabled={musicEnabled} />
-      {/* Fixed Minimalist Header */}
-      <Header
-        activeSection={activeSection}
-        isSpeaking={isSpeaking}
-        toggleSpeech={toggleSpeech}
-        speechSupported={speechSupported}
-        musicEnabled={musicEnabled}
-        toggleMusic={() => setMusicEnabled((current) => !current)}
-      />
-
-      {/* Main Portfolio Sections */}
-      <main>
-        {/* Hero Section (No video/canvas animation, clean authentic photo & typography) */}
-        <Hero />
-        <CinematicReveal><WhoIsSection /></CinematicReveal>
-        <CinematicReveal><DesignWorks /></CinematicReveal>
-        {/* Single authoritative Niuxverse Philosophy section (Zero repetition) */}
-        <CinematicReveal><NiuxversePhilosophy /></CinematicReveal>
-        <CinematicReveal><NiuxverseAcademy /></CinematicReveal>
-        <CinematicReveal><SpeakingSection /></CinematicReveal>
-        <CinematicReveal><ContactSection /></CinematicReveal>
-      </main>
-
-      {/* Footer */}
-      <Footer />
-    </div>
-  );
+  const [theme, setTheme] = useState(() => { try { return localStorage.getItem('niux-theme') || 'light'; } catch { return 'light'; } });
+  useEffect(() => { document.documentElement.dataset.theme = theme; try { localStorage.setItem('niux-theme', theme); } catch {} }, [theme]);
+  return <>
+    <a className="skip-link" href="#works">Skip to selected work</a>
+    <header className="header grid-layout"><a className="wordmark" href="#home">king of<br/>intelligence<span className="brand-dot">®</span></a><nav aria-label="Main navigation"><a href="#works">Work</a><a href="#about">About</a><a href="#contact">Contact <ArrowUpRight size={15}/></a></nav><button className="theme-toggle glass" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} aria-pressed={theme === 'dark'}><Sun size={17}/><span className="toggle-track"><span/></span><Moon size={17}/></button></header>
+    <main>
+      <section id="home" className="hero grid-layout"><div className="hero-top"><span>Independent designer & systems thinker</span><span className="availability"><i/> Open to conversations</span></div><h1><span>Human.</span><span className="hero-line">By design<span className="period">.</span></span></h1><div className="hero-bottom"><span className="hero-signature">Nwaeze David<br/><span>The King of Intelligence</span></span><p>Designing clarity in a complex world.<br/>Bold identities. Thoughtful interfaces.<br/>Intelligence with a human heartbeat.</p><a href="#works" className="round-link" aria-label="Explore selected work"><ArrowDown size={28}/></a></div><div className="hero-index"><span>Design / Technology / Humanity</span><span>Scroll to explore</span></div></section>
+      <ImageShowcase id="works" title="Selected work." description="Thoughtful interfaces and digital experiences. Designed for the human on the other side." images={designImages}/>
+      <ImageShowcase id="brand-work" title="Graphics & brand." description="Visual identities, graphic experiments, and brands with a point of view." images={brandImages}/>
+      <section id="about" className="about grid-layout"><div className="section-label">The person behind the pixels</div><h2>Curious mind.<br/>Human heart.<br/>African roots.</h2><figure><img src="/profile/david-nwaeze-standing.jpg" alt="Nwaeze David" loading="lazy"/><figcaption>Nwaeze David / Designer & founder</figcaption></figure><div className="about-copy"><p>I’m David. A designer with roots in pharmacy and public health, building at the intersection of care, creativity, and intelligent systems.</p><p>{PERSONAL_BIO.shortBio}</p><a className="text-link" href="https://www.linkedin.com/in/david-nwaeze" target="_blank" rel="noreferrer">Meet me on LinkedIn <ArrowUpRight size={20}/></a></div><div className="disciplines"><span>Product design</span><span>AI experiences</span><span>Design systems</span><span>Healthcare empathy</span></div></section>
+      <section className="philosophy grid-layout" id="philosophy"><span className="section-label">The Niuxverse</span><h2>Technology moves.<br/>People give it<br/>direction.</h2><p>{PERSONAL_BIO.quote}</p><div className="principles"><div><h3>Make it clear.</h3><p>Turn complexity into interfaces people understand.</p></div><div><h3>Make it human.</h3><p>Build with care, trust, and human agency at the centre.</p></div><div><h3>Make it matter.</h3><p>Use intelligence to solve real problems and impact lives.</p></div></div></section>
+      <section className="academy grid-layout" id="academy"><span className="section-label">Learning, out loud</span><h2>School of<br/>Intelligenze.</h2><div><p>A space for curious minds to explore AI, ask better questions, and shape a future rooted in human dignity.</p><a href={ACADEMY_DATA.websiteUrl} target="_blank" rel="noreferrer" className="text-link">Explore the school <ArrowUpRight size={22}/></a></div></section>
+      <section id="contact" className="contact grid-layout"><div className="contact-top"><span>Have something in mind?</span><span>Let’s make it meaningful.</span></div><a className="contact-title" href="mailto:theniuxversesolutions@gmail.com">Let’s create.<ArrowUpRight/></a><div className="contact-links"><a href="mailto:theniuxversesolutions@gmail.com">Email David <ArrowUpRight size={18}/></a><a href="https://wa.me/2348110607341" target="_blank" rel="noreferrer">WhatsApp <ArrowUpRight size={18}/></a><a href="https://www.instagram.com/niuxdesigns" target="_blank" rel="noreferrer">Instagram <ArrowUpRight size={18}/></a><a href="https://x.com/NwaezeDavid5" target="_blank" rel="noreferrer">X / Twitter <ArrowUpRight size={18}/></a></div></section>
+    </main><footer className="footer"><span>© {new Date().getFullYear()} Nwaeze David</span><span>Built with intention.</span><a href="#home">Back to top ↑</a></footer>
+  </>;
 }

@@ -5,6 +5,7 @@ coverage/
 .DS_Store
 *.log
 qa-*.jpg
+qa-*.cjs
 pnpm-lock.yaml
 pnpm-workspace.yaml
 .env*
