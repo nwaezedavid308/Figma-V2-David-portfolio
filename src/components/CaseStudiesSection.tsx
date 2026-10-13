@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { ArrowUpRight, Play, Pause, Maximize2, X } from 'lucide-react';
-
+import { motion, AnimatePresence } from 'motion/react';
 interface MediaItem {
   id: string;
   label: string;
@@ -73,7 +73,15 @@ export function CaseStudiesSection() {
   };
 
   return (
-    <section id="case-studies" className="case-studies grid-layout" aria-labelledby="case-studies-heading">
+    <motion.section
+      id="case-studies"
+      className="case-studies grid-layout"
+      aria-labelledby="case-studies-heading"
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+    >
       <div className="section-label">Selected Deep Dives</div>
       
       <div className="case-studies-heading">
@@ -218,6 +226,6 @@ export function CaseStudiesSection() {
           </div>
         </div>
       </dialog>
-    </section>
+    </motion.section>
   );
 }

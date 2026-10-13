@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowDown, ArrowUpRight, Moon, Sun } from 'lucide-react';
+import { motion } from 'motion/react';
 import { ImageShowcase } from './components/ImageShowcase';
 import { CaseStudiesSection } from './components/CaseStudiesSection';
 import { AfroDoodlesOverlay } from './components/AfroDoodlesOverlay';
@@ -21,7 +22,10 @@ export default function App() {
     } catch {}
   }, [theme]);
 
-  const previewSection = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('preview') : null;
+  const previewSection =
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('preview')
+      : null;
 
   useEffect(() => {
     try {
@@ -34,17 +38,23 @@ export default function App() {
   return (
     <div className="app-wrapper">
       <AfroDoodlesOverlay theme={theme} />
-      <a className="skip-link" href="#works">Skip to selected work</a>
-      
+      <a className="skip-link" href="#works">
+        Skip to selected work
+      </a>
+
       <header className="header grid-layout">
         <a className="wordmark" href="#home">
-          king of<br />intelligence<span className="brand-dot">®</span>
+          king of
+          <br />
+          intelligence<span className="brand-dot">®</span>
         </a>
         <nav aria-label="Main navigation">
           <a href="#works">Work</a>
           <a href="#case-studies">Case Studies</a>
           <a href="#about">About</a>
-          <a href="#contact">Contact <ArrowUpRight size={15} /></a>
+          <a href="#contact">
+            Contact <ArrowUpRight size={15} />
+          </a>
         </nav>
         <button
           className="theme-toggle glass"
@@ -53,34 +63,54 @@ export default function App() {
           aria-pressed={theme === 'dark'}
         >
           <Sun size={17} />
-          <span className="toggle-track"><span /></span>
+          <span className="toggle-track">
+            <span />
+          </span>
           <Moon size={17} />
         </button>
       </header>
 
       <main>
         {(!previewSection || previewSection === 'home') && (
-          <section id="home" className="hero grid-layout">
+          <motion.section
+            id="home"
+            className="hero grid-layout"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div className="hero-top">
               <span>Independent designer &amp; systems thinker</span>
-              <span className="availability"><i /> Open to conversations</span>
+              <span className="availability">
+                <i /> Open to conversations
+              </span>
             </div>
 
             <h1>
               <span>Human.</span>
-              <span className="hero-line">By design<span className="period">.</span></span>
+              <span className="hero-line">
+                By design<span className="period">.</span>
+              </span>
             </h1>
 
             <div className="hero-bottom">
               <span className="hero-signature">
-                Nwaeze David<br /><span>The King of Intelligence</span>
+                Nwaeze David
+                <br />
+                <span>The King of Intelligence</span>
               </span>
               <p>
-                Designing clarity in a complex world.<br />
-                Bold identities. Thoughtful interfaces.<br />
+                Designing clarity in a complex world.
+                <br />
+                Bold identities. Thoughtful interfaces.
+                <br />
                 Intelligence with a human heartbeat.
               </p>
-              <a href="#works" className="round-link" aria-label="Explore selected work">
+              <a
+                href="#works"
+                className="round-link"
+                aria-label="Explore selected work"
+              >
                 <ArrowDown size={28} />
               </a>
             </div>
@@ -89,7 +119,7 @@ export default function App() {
               <span>Design / Technology / Humanity</span>
               <span>Scroll to explore</span>
             </div>
-          </section>
+          </motion.section>
         )}
 
         {(!previewSection || previewSection === 'works') && (
@@ -115,20 +145,63 @@ export default function App() {
         )}
 
         {(!previewSection || previewSection === 'about') && (
-          <section id="about" className="about grid-layout">
+          <motion.section
+            id="about"
+            className="about grid-layout"
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div className="section-label">The person behind the pixels</div>
-            <h2>Curious mind.<br />Human heart.<br />African roots.</h2>
+            <h2>
+              Curious mind.
+              <br />
+              Human heart.
+              <br />
+              African roots.
+            </h2>
             <figure>
-              <img src="/profile/david-1.jpg" alt="Nwaeze David" loading="lazy" />
+              <img
+                src="/profile/david-1.jpg"
+                alt="Nwaeze David"
+                loading="lazy"
+              />
               <figcaption>Nwaeze David / Designer &amp; founder</figcaption>
             </figure>
             <div className="about-copy">
-              <p>I’m David. A designer with roots in pharmacy and public health, building at the intersection of care, creativity, and intelligent systems.</p>
-              <p>That clinical background taught me something you never forget: when someone is sick or scared, an interface that makes them guess isn't bad taste—it's dangerous.</p>
-              <p>While others chase trendy visual gimmicks, I ask: Can a tired doctor read this at 3 AM? Can a mother understand this dosage without calling customer care? Does it respect the user's dignity?</p>
-              <p>Today, I run Niuxverse Solutions from Lagos, working with founders globally across AI, healthcare, and smart physical hardware.</p>
-              <p>When I'm not designing, I'm deep into public health research, music, and building tools that make human life calmer and simpler.</p>
-              <a className="text-link" href="https://www.linkedin.com/in/david-nwaeze" target="_blank" rel="noreferrer">
+              <p>
+                I’m David. A designer with roots in pharmacy and public health,
+                building at the intersection of care, creativity, and intelligent
+                systems.
+              </p>
+              <p>
+                That clinical background taught me something you never forget:
+                when someone is sick or scared, an interface that makes them
+                guess isn't bad taste—it's dangerous.
+              </p>
+              <p>
+                While others chase trendy visual gimmicks, I ask: Can a tired
+                doctor read this at 3 AM? Can a mother understand this dosage
+                without calling customer care? Does it respect the user's
+                dignity?
+              </p>
+              <p>
+                Today, I run Niuxverse Solutions from Lagos, working with
+                founders globally across AI, healthcare, and smart physical
+                hardware.
+              </p>
+              <p>
+                When I'm not designing, I'm deep into public health research,
+                music, and building tools that make human life calmer and
+                simpler.
+              </p>
+              <a
+                className="text-link"
+                href="https://www.linkedin.com/in/david-nwaeze"
+                target="_blank"
+                rel="noreferrer"
+              >
                 Meet me on LinkedIn <ArrowUpRight size={20} />
               </a>
             </div>
@@ -138,14 +211,31 @@ export default function App() {
               <span>Design systems</span>
               <span>Healthcare empathy</span>
             </div>
-          </section>
+          </motion.section>
         )}
 
         {(!previewSection || previewSection === 'philosophy') && (
-          <section className="philosophy grid-layout" id="philosophy">
+          <motion.section
+            className="philosophy grid-layout"
+            id="philosophy"
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
             <span className="section-label">The Niuxverse</span>
-            <h2>Technology moves.<br />People give it<br />direction.</h2>
-            <p>Building the Niuxverse: a universe of tools, experiences, and systems where technology amplifies human agency instead of replacing it.</p>
+            <h2>
+              Technology moves.
+              <br />
+              People give it
+              <br />
+              direction.
+            </h2>
+            <p>
+              Building the Niuxverse: a universe of tools, experiences, and
+              systems where technology amplifies human agency instead of
+              replacing it.
+            </p>
             <div className="principles">
               <div>
                 <h3>Make it clear.</h3>
@@ -160,25 +250,56 @@ export default function App() {
                 <p>Use intelligence to solve real problems and impact lives.</p>
               </div>
             </div>
-          </section>
+          </motion.section>
         )}
 
         {(!previewSection || previewSection === 'contact') && (
-          <section id="contact" className="contact grid-layout">
+          <motion.section
+            id="contact"
+            className="contact grid-layout"
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div className="contact-top">
               <span>Have something in mind?</span>
               <span>Let’s make it meaningful.</span>
             </div>
-            <a className="contact-title" href="mailto:theniuxversesolutions@gmail.com">
-              Let’s create.<ArrowUpRight />
+            <a
+              className="contact-title"
+              href="mailto:theniuxversesolutions@gmail.com"
+            >
+              Let’s create.
+              <ArrowUpRight />
             </a>
             <div className="contact-links">
-              <a href="mailto:theniuxversesolutions@gmail.com">Email David <ArrowUpRight size={18} /></a>
-              <a href="https://wa.me/2348110607341" target="_blank" rel="noreferrer">WhatsApp <ArrowUpRight size={18} /></a>
-              <a href="https://www.instagram.com/niuxdesigns" target="_blank" rel="noreferrer">Instagram <ArrowUpRight size={18} /></a>
-              <a href="https://x.com/NwaezeDavid5" target="_blank" rel="noreferrer">X / Twitter <ArrowUpRight size={18} /></a>
+              <a href="mailto:theniuxversesolutions@gmail.com">
+                Email David <ArrowUpRight size={18} />
+              </a>
+              <a
+                href="https://wa.me/2348110607341"
+                target="_blank"
+                rel="noreferrer"
+              >
+                WhatsApp <ArrowUpRight size={18} />
+              </a>
+              <a
+                href="https://www.instagram.com/niuxdesigns"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Instagram <ArrowUpRight size={18} />
+              </a>
+              <a
+                href="https://x.com/NwaezeDavid5"
+                target="_blank"
+                rel="noreferrer"
+              >
+                X / Twitter <ArrowUpRight size={18} />
+              </a>
             </div>
-          </section>
+          </motion.section>
         )}
       </main>
 
