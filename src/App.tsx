@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowDown, ArrowUpRight, Moon, Sun } from 'lucide-react';
 import { ImageShowcase } from './components/ImageShowcase';
 import { CaseStudiesSection } from './components/CaseStudiesSection';
+import { AfroDoodlesOverlay } from './components/AfroDoodlesOverlay';
 import { designImages, brandImages } from 'virtual:showcase-images';
 
 export default function App() {
@@ -31,7 +32,8 @@ export default function App() {
   }, []);
 
   return (
-    <>
+    <div className="app-wrapper">
+      <AfroDoodlesOverlay theme={theme} />
       <a className="skip-link" href="#works">Skip to selected work</a>
       
       <header className="header grid-layout">
@@ -185,6 +187,6 @@ export default function App() {
         <span>Built with intention.</span>
         <a href="#home">Back to top ↑</a>
       </footer>
-    </>
+    </div>
   );
 }

@@ -560,3 +560,126 @@ nav a:hover, .text-link:hover, .contact-links a:hover {
     aspect-ratio: 4 / 3;
   }
 }
+
+/* ============================================================
+   Afro Pattern Watermark & Scattered Doodles (Subtle Opacity)
+   ============================================================ */
+.afro-doodles-root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.afro-pattern-watermark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: repeat;
+  background-size: 700px auto;
+  opacity: 0.045; /* Very subtle luxury watermark on white background */
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+:root[data-theme=dark] .afro-pattern-watermark {
+  opacity: 0.045; /* Very subtle starlight white on dark ash */
+  mix-blend-mode: screen;
+}
+
+.afro-scattered-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.scattered-item {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.055;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+:root[data-theme=dark] .scattered-item {
+  opacity: 0.065;
+}
+
+.doodle-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Scattered positions across the page */
+.doodle-pos-hero-sun {
+  top: 130px;
+  right: 5vw;
+  width: clamp(80px, 8vw, 140px);
+  transform: rotate(12deg);
+}
+
+.doodle-pos-hero-arch {
+  top: 720px;
+  left: 4vw;
+  width: clamp(75px, 7vw, 120px);
+  transform: rotate(-8deg);
+}
+
+.doodle-pos-works-shield {
+  top: 1350px;
+  right: 3vw;
+  width: clamp(80px, 7.5vw, 130px);
+  transform: rotate(6deg);
+}
+
+.doodle-pos-case-triangle {
+  top: 2350px;
+  left: 3vw;
+  width: clamp(85px, 8vw, 135px);
+  transform: rotate(-10deg);
+}
+
+.doodle-pos-brand-ring {
+  top: 3500px;
+  right: 4vw;
+  width: clamp(70px, 6.5vw, 110px);
+  transform: rotate(15deg);
+}
+
+.doodle-pos-about-eye {
+  top: 4500px;
+  left: 3.5vw;
+  width: clamp(80px, 7.5vw, 125px);
+  transform: rotate(-6deg);
+}
+
+.doodle-pos-philosophy-leaf {
+  top: 5500px;
+  right: 5vw;
+  width: clamp(75px, 7vw, 120px);
+  transform: rotate(20deg);
+}
+
+/* Ensure interactive sections stack appropriately */
+header, main > section, footer {
+  position: relative;
+  z-index: 2;
+}
+
+.app-wrapper {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--paper);
+}
