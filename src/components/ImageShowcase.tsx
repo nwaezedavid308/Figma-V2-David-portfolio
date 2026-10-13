@@ -28,6 +28,47 @@ export function ImageShowcase({
   const scrollStart = useRef(0);
   const hasDragged = useRef(false);
 
+  // Continuous auto-glide physics with hover-to-pause
+  const isHovered = useRef(false);
+  const isInteracting = useRef(false);
+  const interactionTimer = useRef<number | null>(null);
+
+  // Duplicate cards for seamless endless marquee loop
+  const loopImages = images.length > 2 ? [...images, ...images] : images;
+
+  useEffect(() => {
+    let animId: number;
+    let lastTime = performance.now();
+    const autoScrollSpeed = 0.55; // Gentle, elegant exhibition speed
+
+    const step = (time: number) => {
+      const dt = Math.min((time - lastTime) / 16.67, 2); // 60/120Hz normalization
+      lastTime = time;
+
+      if (
+        rail.current &&
+        !isHovered.current &&
+        !isDragging.current &&
+        !isInteracting.current &&
+        !selected &&
+        images.length > 2
+      ) {
+        rail.current.scrollLeft += autoScrollSpeed * dt;
+
+        // Seamless wrap-around when the first set has scrolled past
+        const halfWidth = rail.current.scrollWidth / 2;
+        if (rail.current.scrollLeft >= halfWidth) {
+          rail.current.scrollLeft -= halfWidth;
+        }
+      }
+
+      animId = requestAnimationFrame(step);
+    };
+
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [images.length, selected]);
+
   useEffect(() => {
     if (selected) {
       dialog.current?.showModal();
@@ -38,17 +79,29 @@ export function ImageShowcase({
     };
   }, [selected]);
 
-  const go = (index: number) => {
+  const pauseAutoScrollTemporarily = (duration = 1200) => {
+    isInteracting.current = true;
+    if (interactionTimer.current) clearTimeout(interactionTimer.current);
+    interactionTimer.current = window.setTimeout(() => {
+      isInteracting.current = false;
+    }, duration);
+  };
+
+  const go = (targetIndex: number) => {
     if (!rail.current) return;
-    const card = rail.current.children[index] as HTMLElement;
+    pauseAutoScrollTemporarily(1500);
+
+    const safeIndex = Math.max(0, Math.min(images.length - 1, targetIndex));
+    const card = rail.current.children[safeIndex] as HTMLElement;
     if (!card) return;
+
     const max = rail.current.scrollWidth - rail.current.clientWidth;
     const left = Math.min(
       card.offsetLeft - parseFloat(getComputedStyle(rail.current).paddingLeft),
       max
     );
     rail.current.scrollTo({ left, behavior: 'smooth' });
-    setActive(index);
+    setActive(safeIndex);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -68,6 +121,16 @@ export function ImageShowcase({
       hasDragged.current = true;
       e.preventDefault();
       rail.current.scrollLeft = scrollStart.current - walk;
+
+      // Handle loop wrapping during manual drag as well
+      const halfWidth = rail.current.scrollWidth / 2;
+      if (images.length > 2) {
+        if (rail.current.scrollLeft >= halfWidth) {
+          rail.current.scrollLeft -= halfWidth;
+        } else if (rail.current.scrollLeft <= 0) {
+          rail.current.scrollLeft += halfWidth;
+        }
+      }
     }
   };
 
@@ -96,6 +159,13 @@ export function ImageShowcase({
       ref={section}
       className="work-journey image-showcase"
       aria-labelledby={`${id}-heading`}
+      onMouseEnter={() => {
+        isHovered.current = true;
+      }}
+      onMouseLeave={() => {
+        isHovered.current = false;
+        handleMouseUpOrLeave();
+      }}
     >
       <div className="work-stage">
         <div className="work-heading grid-layout">
@@ -103,7 +173,7 @@ export function ImageShowcase({
           <p>{description}</p>
           <span className="work-count">
             {images.length
-              ? `${String(Math.min(active + 1, images.length)).padStart(2, '0')} / ${String(images.length).padStart(2, '0')}`
+              ? `${String(Math.min((active % images.length) + 1, images.length)).padStart(2, '0')} / ${String(images.length).padStart(2, '0')}`
               : 'Coming soon'}
           </span>
         </div>
@@ -120,15 +190,19 @@ export function ImageShowcase({
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUpOrLeave}
-              onMouseLeave={handleMouseUpOrLeave}
+              onMouseEnter={() => {
+                isHovered.current = true;
+              }}
+              onMouseLeave={() => {
+                isHovered.current = false;
+                handleMouseUpOrLeave();
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
                   e.preventDefault();
                   go(
-                    Math.max(
-                      0,
-                      Math.min(images.length - 1, active + (e.key === 'ArrowRight' ? 1 : -1))
-                    )
+                    (active % images.length) +
+                      (e.key === 'ArrowRight' ? 1 : -1)
                   );
                 }
               }}
@@ -144,65 +218,72 @@ export function ImageShowcase({
                       el.scrollWidth - el.clientWidth
                     ) - el.scrollLeft
                   );
-                setActive(
-                  cards.reduce(
-                    (best, _, i) => (distance(i) < distance(best) ? i : best),
-                    0
-                  )
+                const bestIdx = cards.reduce(
+                  (best, _, i) => (distance(i) < distance(best) ? i : best),
+                  0
                 );
+                setActive(bestIdx % images.length);
               }}
             >
-              {images.map((image, i) => (
-                <article
-                  className="project"
-                  key={image.src}
-                  aria-label={`${i + 1} of ${images.length}: ${image.title}`}
-                >
-                  <button
-                    className="project-image"
-                    onClick={() => handleCardClick(image)}
-                    aria-label={`View ${image.title}`}
+              {loopImages.map((image, i) => {
+                const originalIndex = i % images.length;
+                return (
+                  <article
+                    className="project"
+                    key={`${image.src}-${i}`}
+                    aria-label={`${originalIndex + 1} of ${images.length}: ${image.title}`}
                   >
-                    <img
-                      src={image.preview || image.src}
-                      alt={image.title}
-                      loading={i < 3 ? 'eager' : 'lazy'}
-                      onLoad={(e) => {
-                        const imageEl = e.currentTarget;
-                        const card = imageEl.closest('.project') as HTMLElement | null;
-                        if (card)
-                          card.dataset.orientation =
-                            imageEl.naturalWidth / imageEl.naturalHeight < 0.8
-                              ? 'portrait'
-                              : 'landscape';
-                      }}
-                    />
-                    <span className="project-number">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="image-label glass">View design</span>
-                    <span className="project-open glass">
-                      <ArrowUpRight size={22} />
-                    </span>
-                  </button>
-                  <div className="project-caption">
-                    <div>
-                      <span>{image.category}</span>
-                      <h3>
-                        <button onClick={() => handleCardClick(image)}>
-                          {image.title}
-                        </button>
-                      </h3>
+                    <button
+                      className="project-image"
+                      onClick={() => handleCardClick(image)}
+                      aria-label={`View ${image.title}`}
+                    >
+                      <img
+                        src={image.preview || image.src}
+                        alt={image.title}
+                        loading={i < 4 ? 'eager' : 'lazy'}
+                        onLoad={(e) => {
+                          const imageEl = e.currentTarget;
+                          const card = imageEl.closest('.project') as HTMLElement | null;
+                          if (card)
+                            card.dataset.orientation =
+                              imageEl.naturalWidth / imageEl.naturalHeight < 0.8
+                                ? 'portrait'
+                                : 'landscape';
+                        }}
+                      />
+                      <span className="project-number">
+                        {String(originalIndex + 1).padStart(2, '0')}
+                      </span>
+                      <span className="image-label glass">View design</span>
+                      <span className="project-open glass">
+                        <ArrowUpRight size={22} />
+                      </span>
+                    </button>
+                    <div className="project-caption">
+                      <div>
+                        <span>{image.category}</span>
+                        <h3>
+                          <button onClick={() => handleCardClick(image)}>
+                            {image.title}
+                          </button>
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </div>
 
             <div className="carousel-footer">
-              <span>Drag to explore sideways. Click to inspect in detail.</span>
+              <span className="carousel-hint">
+                Continuous auto-scroll active · Hover to pause · Drag to explore
+              </span>
               {allImages.length > 8 && (
                 <button
                   className="collection-button"
                   onClick={() => {
+                    pauseAutoScrollTemporarily(2000);
                     setShowAll(!showAll);
                     setActive(0);
                     if (rail.current) rail.current.scrollLeft = 0;
@@ -217,18 +298,16 @@ export function ImageShowcase({
               <div className="carousel-controls glass">
                 <button
                   aria-label={`Previous ${title} image`}
-                  disabled={active === 0}
-                  onClick={() => go(active - 1)}
+                  onClick={() => go((active % images.length) - 1)}
                 >
                   <ArrowLeft size={18} />
                 </button>
                 <span className="carousel-position" aria-live="polite">
-                  {Math.min(active + 1, images.length)} / {images.length}
+                  {Math.min((active % images.length) + 1, images.length)} / {images.length}
                 </span>
                 <button
                   aria-label={`Next ${title} image`}
-                  disabled={active >= images.length - 1}
-                  onClick={() => go(active + 1)}
+                  onClick={() => go((active % images.length) + 1)}
                 >
                   <ArrowRight size={18} />
                 </button>

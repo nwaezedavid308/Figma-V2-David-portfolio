@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Play, Pause, Maximize2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -138,9 +138,11 @@ export function CaseStudiesSection() {
   const [slideDirection, setSlideDirection] = useState(0);
   const [activeMediaIndices, setActiveMediaIndices] = useState<Record<string, number>>({});
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const touchStartX = useRef(0);
 
   const currentProject = CASE_STUDY_PROJECTS[projectIndex];
   const currentMediaIndex = activeMediaIndices[currentProject.id] || 0;
@@ -160,7 +162,19 @@ export function CaseStudiesSection() {
     } catch {}
   }, []);
 
-  // Reset video play status on project change
+  // Luring auto-advance horizontally every 6.5s unless hovered or dialog is open
+  useEffect(() => {
+    if (isPaused || lightboxOpen) return;
+
+    const timer = setInterval(() => {
+      setSlideDirection(1);
+      setProjectIndex((prev) => (prev + 1) % CASE_STUDY_PROJECTS.length);
+    }, 6500);
+
+    return () => clearInterval(timer);
+  }, [isPaused, lightboxOpen, projectIndex]);
+
+  // Reset video playback on project change
   useEffect(() => {
     setIsPlaying(true);
     if (videoRef.current) {
@@ -176,15 +190,32 @@ export function CaseStudiesSection() {
   };
 
   const handlePrev = () => {
-    if (projectIndex > 0) {
-      goToProject(projectIndex - 1);
-    }
+    setSlideDirection(-1);
+    setProjectIndex(
+      (prev) => (prev - 1 + CASE_STUDY_PROJECTS.length) % CASE_STUDY_PROJECTS.length
+    );
   };
 
   const handleNext = () => {
-    if (projectIndex < CASE_STUDY_PROJECTS.length - 1) {
-      goToProject(projectIndex + 1);
+    setSlideDirection(1);
+    setProjectIndex((prev) => (prev + 1) % CASE_STUDY_PROJECTS.length);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (diff > 45) {
+      handleNext();
+    } else if (diff < -45) {
+      handlePrev();
     }
+    setTimeout(() => {
+      setIsPaused(false);
+    }, 2500);
   };
 
   const togglePlay = () => {
@@ -199,6 +230,7 @@ export function CaseStudiesSection() {
   };
 
   const openLightbox = () => {
+    setIsPaused(true);
     setLightboxOpen(true);
     dialogRef.current?.showModal();
     document.body.style.overflow = 'hidden';
@@ -206,6 +238,7 @@ export function CaseStudiesSection() {
 
   const closeLightbox = () => {
     setLightboxOpen(false);
+    setIsPaused(false);
     dialogRef.current?.close();
     document.body.style.overflow = '';
   };
@@ -219,6 +252,8 @@ export function CaseStudiesSection() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
       <div className="section-label">Selected Deep Dives</div>
 
@@ -237,44 +272,60 @@ export function CaseStudiesSection() {
 
       {/* Horizontal Carousel Header Controls */}
       <div className="case-studies-carousel-controls">
-        {/* Project Selector Pills */}
+        {/* Project Selector Pills with Progress Fill */}
         <div className="case-study-pills" role="tablist" aria-label="Case Study Products">
-          {CASE_STUDY_PROJECTS.map((proj, idx) => (
-            <button
-              key={proj.id}
-              role="tab"
-              aria-selected={projectIndex === idx}
-              className={`case-study-pill-btn ${projectIndex === idx ? 'is-active' : ''}`}
-              onClick={() => goToProject(idx)}
-            >
-              <span className="pill-num">{proj.number}</span>
-              <span className="pill-title">{proj.shortTitle}</span>
-            </button>
-          ))}
+          {CASE_STUDY_PROJECTS.map((proj, idx) => {
+            const isActive = projectIndex === idx;
+            return (
+              <button
+                key={proj.id}
+                role="tab"
+                aria-selected={isActive}
+                className={`case-study-pill-btn ${isActive ? 'is-active' : ''}`}
+                onClick={() => {
+                  goToProject(idx);
+                }}
+              >
+                <span className="pill-num">{proj.number}</span>
+                <span className="pill-title">{proj.shortTitle}</span>
+                {isActive && (
+                  <span
+                    className="pill-progress-bar"
+                    style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Carousel Arrow Controls & Indicator */}
-        <div className="case-studies-arrows">
-          <button
-            onClick={handlePrev}
-            disabled={projectIndex === 0}
-            className="carousel-arrow-btn glass"
-            aria-label="Previous case study project"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <span className="case-studies-counter" aria-live="polite">
-            {String(projectIndex + 1).padStart(2, '0')} /{' '}
-            {String(CASE_STUDY_PROJECTS.length).padStart(2, '0')}
-          </span>
-          <button
-            onClick={handleNext}
-            disabled={projectIndex === CASE_STUDY_PROJECTS.length - 1}
-            className="carousel-arrow-btn glass"
-            aria-label="Next case study project"
-          >
-            <ArrowRight size={18} />
-          </button>
+        {/* Carousel Arrow Controls & Live Status Indicator */}
+        <div className="case-studies-arrows-wrap">
+          <div className="luring-badge glass" aria-live="polite">
+            <span className={`pulse-dot ${isPaused ? 'is-paused' : ''}`} />
+            <span>{isPaused ? 'Paused' : 'Auto-gliding'}</span>
+          </div>
+
+          <div className="case-studies-arrows">
+            <button
+              onClick={handlePrev}
+              className="carousel-arrow-btn glass"
+              aria-label="Previous case study project"
+            >
+              <ArrowLeft size={18} />
+            </button>
+            <span className="case-studies-counter" aria-live="polite">
+              {String(projectIndex + 1).padStart(2, '0')} /{' '}
+              {String(CASE_STUDY_PROJECTS.length).padStart(2, '0')}
+            </span>
+            <button
+              onClick={handleNext}
+              className="carousel-arrow-btn glass"
+              aria-label="Next case study project"
+            >
+              <ArrowRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -288,14 +339,18 @@ export function CaseStudiesSection() {
             custom={slideDirection}
             initial={{
               opacity: 0,
-              x: slideDirection > 0 ? 40 : slideDirection < 0 ? -40 : 0,
+              x: slideDirection > 0 ? 36 : slideDirection < 0 ? -36 : 0,
             }}
             animate={{ opacity: 1, x: 0 }}
             exit={{
               opacity: 0,
-              x: slideDirection > 0 ? -40 : 40,
+              x: slideDirection > 0 ? -36 : 36,
             }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           >
             {/* Left Column: Product Video Thumbnail & Gallery */}
             <div className="case-study-media-col">
@@ -309,6 +364,7 @@ export function CaseStudiesSection() {
                     loop
                     muted
                     playsInline
+                    preload="auto"
                     className="case-study-video"
                     onPlay={() => setIsPlaying(true)}
                     onPause={() => setIsPlaying(false)}
