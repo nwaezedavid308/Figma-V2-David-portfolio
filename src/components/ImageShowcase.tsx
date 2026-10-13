@@ -39,7 +39,8 @@ export function ImageShowcase({
   useEffect(() => {
     let animId: number;
     let lastTime = performance.now();
-    const autoScrollSpeed = 0.55; // Gentle, elegant exhibition speed
+    // Increased scroll duration: serene luxury gallery speed (~17px/sec)
+    const autoScrollSpeed = 0.28;
 
     const step = (time: number) => {
       const dt = Math.min((time - lastTime) / 16.67, 2); // 60/120Hz normalization
@@ -197,6 +198,8 @@ export function ImageShowcase({
                 isHovered.current = false;
                 handleMouseUpOrLeave();
               }}
+              onTouchStart={() => pauseAutoScrollTemporarily(3500)}
+              onTouchEnd={() => pauseAutoScrollTemporarily(2000)}
               onKeyDown={(e) => {
                 if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
                   e.preventDefault();
