@@ -22,11 +22,6 @@ export default function App() {
     } catch {}
   }, [theme]);
 
-  const previewSection =
-    typeof window !== 'undefined'
-      ? new URLSearchParams(window.location.search).get('preview')
-      : null;
-
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -71,88 +66,79 @@ export default function App() {
       </header>
 
       <main>
-        {(!previewSection || previewSection === 'home') && (
-          <motion.section
-            id="home"
-            className="hero grid-layout"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div className="hero-top">
-              <span>Independent designer &amp; systems thinker</span>
-              <span className="availability">
-                <i /> Open to conversations
-              </span>
-            </div>
+        <motion.section
+          id="home"
+          className="hero grid-layout"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="hero-top">
+            <span>Independent designer &amp; systems thinker</span>
+            <span className="availability">
+              <i /> Open to conversations
+            </span>
+          </div>
 
-            <h1>
-              <span>Human.</span>
-              <span className="hero-line">
-                By design<span className="period">.</span>
-              </span>
-            </h1>
+          <h1>
+            <span>Human.</span>
+            <span className="hero-line">
+              By design<span className="period">.</span>
+            </span>
+          </h1>
 
-            <div className="hero-bottom">
-              <span className="hero-signature">
-                Nwaeze David
-                <br />
-                <span>The King of Intelligence</span>
-              </span>
-              <p>
-                Designing clarity in a complex world.
-                <br />
-                Bold identities. Thoughtful interfaces.
-                <br />
-                Intelligence with a human heartbeat.
-              </p>
-              <a
-                href="#works"
-                className="round-link"
-                aria-label="Explore selected work"
-              >
-                <ArrowDown size={28} />
-              </a>
-            </div>
+          <div className="hero-bottom">
+            <span className="hero-signature">
+              Nwaeze David
+              <br />
+              <span>The King of Intelligence</span>
+            </span>
+            <p>
+              Designing clarity in a complex world.
+              <br />
+              Bold identities. Thoughtful interfaces.
+              <br />
+              Intelligence with a human heartbeat.
+            </p>
+            <a
+              href="#works"
+              className="round-link"
+              aria-label="Explore selected work"
+            >
+              <ArrowDown size={28} />
+            </a>
+          </div>
 
-            <div className="hero-index">
-              <span>Design / Technology / Humanity</span>
-              <span>Scroll to explore</span>
-            </div>
-          </motion.section>
-        )}
+          <div className="hero-index">
+            <span>Design / Technology / Humanity</span>
+            <span>Scroll to explore</span>
+          </div>
+        </motion.section>
 
-        {(!previewSection || previewSection === 'works') && (
-          <ImageShowcase
-            id="works"
-            title="Selected work."
-            description="Thoughtful interfaces and digital experiences. Designed for the human on the other side."
-            images={designImages}
-          />
-        )}
+        <ImageShowcase
+          id="works"
+          title="Selected work."
+          description="Thoughtful interfaces and digital experiences. Designed for the human on the other side."
+          images={designImages}
+        />
 
-        {(!previewSection || previewSection === 'case-studies') && (
-          <CaseStudiesSection />
-        )}
+        <CaseStudiesSection />
 
-        {(!previewSection || previewSection === 'brand') && (
-          <ImageShowcase
-            id="brand-work"
-            title="Graphics & brand."
-            description="Visual identities, graphic experiments, and brands with a point of view."
-            images={brandImages}
-          />
-        )}
+        <ImageShowcase
+          id="brand-work"
+          title="Graphics & brand."
+          description="Visual identities, graphic experiments, and brands with a point of view."
+          images={brandImages}
+        />
 
-        {(!previewSection || previewSection === 'about') && (
-          <motion.section
-            id="about"
-            className="about grid-layout"
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
+        <motion.section
+          id="about"
+          className="about grid-layout"
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        >
             <div className="section-label">The person behind the pixels</div>
             <h2>
               Curious mind.
@@ -212,9 +198,7 @@ export default function App() {
               <span>Healthcare empathy</span>
             </div>
           </motion.section>
-        )}
 
-        {(!previewSection || previewSection === 'philosophy') && (
           <motion.section
             className="philosophy grid-layout"
             id="philosophy"
@@ -251,9 +235,7 @@ export default function App() {
               </div>
             </div>
           </motion.section>
-        )}
 
-        {(!previewSection || previewSection === 'contact') && (
           <motion.section
             id="contact"
             className="contact grid-layout"
@@ -300,13 +282,20 @@ export default function App() {
               </a>
             </div>
           </motion.section>
-        )}
       </main>
 
       <footer className="footer">
         <span>© {new Date().getFullYear()} Nwaeze David</span>
         <span>Built with intention.</span>
-        <a href="#home">Back to top ↑</a>
+        <a
+          href="#home"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        >
+          Back to top ↑
+        </a>
       </footer>
     </div>
   );

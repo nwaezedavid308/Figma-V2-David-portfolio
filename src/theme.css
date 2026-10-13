@@ -32,7 +32,12 @@
   --glass-border: rgba(255, 255, 255, 0.12);
 }
 
-/* Base smoothing and transitions */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   background: var(--paper);
   color: var(--ink);
@@ -42,7 +47,6 @@ body {
 .app-wrapper {
   position: relative;
   min-height: 100vh;
-  overflow-x: hidden;
   background: var(--paper);
   transition: background-color 0.3s ease;
 }
