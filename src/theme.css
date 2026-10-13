@@ -528,6 +528,105 @@ nav a:hover {
   line-height: 1.6;
 }
 
+/* Horizontal Carousel Controls & Navigation */
+.case-studies-carousel-controls {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 10px;
+  margin-bottom: 24px;
+}
+
+.case-study-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.case-study-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 30px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease,
+              box-shadow 0.25s ease;
+}
+
+.case-study-pill-btn:hover {
+  color: var(--ink);
+  border-color: var(--muted);
+  transform: translateY(-2px);
+}
+
+.case-study-pill-btn.is-active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+  font-weight: 700;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.case-study-pill-btn .pill-num {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.case-studies-arrows {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.carousel-arrow-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--ink);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.2s ease;
+}
+
+.carousel-arrow-btn:hover:not(:disabled) {
+  transform: scale(1.08);
+}
+
+.carousel-arrow-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.case-studies-counter {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  padding: 0 4px;
+}
+
+.case-study-carousel-stage {
+  grid-column: 1 / -1;
+  position: relative;
+  width: 100%;
+}
+
 .case-study-feature {
   grid-column: 1 / -1;
   display: grid;
@@ -878,6 +977,25 @@ nav a:hover {
   }
   .case-study-title {
     font-size: 24px;
+  }
+  .case-studies-carousel-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .case-studies-arrows {
+    align-self: flex-end;
+  }
+  .case-study-pills {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    flex-wrap: nowrap;
+  }
+  .case-study-pill-btn {
+    white-space: nowrap;
+    padding: 7px 14px;
+    font-size: 12px;
   }
   .case-study-media-wrapper {
     aspect-ratio: 4 / 3;
