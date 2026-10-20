@@ -10,3 +10,4 @@ pnpm-lock.yaml
 pnpm-workspace.yaml
 .env*
 !.env.example
+rename-folder.bat
